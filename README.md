@@ -1,165 +1,297 @@
-# Presenton - Next.js AI Presentation Generator
+# Presenton - FastAPI Presentation Service
 
-Open-source AI presentation generator built with Next.js. Generate professional presentations using AI - all running locally on your device.
+A powerful FastAPI-based service for creating AI-powered presentations using various LLM providers (OpenAI, Anthropic, Google, Ollama).
 
-## 🚀 Quick Start
+## Features
 
-### Prerequisites
-- Node.js 18+ installed
-- npm or yarn package manager
+- 🤖 Multiple LLM provider support (OpenAI, Anthropic, Google Gemini, Ollama, Custom)
+- 🖼️ Image generation and search integration (Pexels, Pixabay)
+- 📊 Presentation template management
+- 🎨 Customizable layouts and themes
+- 🔄 Webhook support
+- 📝 Document parsing (PDF, PPTX)
+- 💾 SQLite/PostgreSQL/MySQL database support
 
-### Setup
+## Prerequisites
 
-1. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+- Python 3.11 (required)
+- pip or uv package manager
 
-2. **Set up environment variables**:
-   ```bash
-   cp .env.example .env
-   ```
-   Edit `.env` and add your API keys.
+## Quick Start
 
-3. **Initialize database**:
-   ```bash
-   npx prisma generate
-   npx prisma db push
-   ```
+### 1. Clone and Navigate
 
-4. **Run development server**:
-   ```bash
-   npm run dev
-   ```
-
-5. **Open your browser**:
-   Navigate to [http://localhost:3000](http://localhost:3000)
-
-## ✨ Features
-
-- ✅ **AI-Powered Generation** — Generate presentations from prompts or documents
-- ✅ **Multiple LLM Providers** — OpenAI, Google Gemini, Anthropic Claude, Ollama
-- ✅ **Custom Templates** — Create unlimited presentation designs
-- ✅ **Export Ready** — Save as PowerPoint (PPTX) and PDF
-- ✅ **Image Generation** — DALL-E 3, Gemini Flash, Pexels, Pixabay
-- ✅ **Fully Open-Source** — Apache 2.0 licensed
-- ✅ **Privacy First** — All processing happens on your device
-
-## 📁 Project Structure
-
-```
-presenton/
-├── app/                    # Next.js app directory
-│   ├── api/               # API routes
-│   │   └── v1/ppt/       # Presentation API endpoints
-│   ├── (presentation-generator)/  # UI pages
-│   └── ...
-├── components/            # React components
-├── lib/                   # Utilities and services
-│   └── db.ts             # Prisma database client
-├── prisma/               # Database schema
-│   └── schema.prisma
-├── public/               # Static assets
-├── types/                # TypeScript types
-├── utils/                # Helper functions
-├── .env                  # Environment variables
-└── package.json          # Dependencies
+```bash
+cd d:\react-js\presentation-1
 ```
 
-## 🔧 Configuration
+### 2. Create Virtual Environment
 
-Edit `.env` to configure your LLM provider and API keys:
+```bash
+python -m venv venv
+```
+
+### 3. Activate Virtual Environment
+
+**Windows:**
+```bash
+.\venv\Scripts\activate
+```
+
+**Linux/Mac:**
+```bash
+source venv/bin/activate
+```
+
+### 4. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 5. Configure Environment
+
+Create a `.env` file in the root directory (copy from `.env.example`):
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and configure your settings:
 
 ```env
-# Choose your LLM provider
-LLM="openai"  # Options: openai, google, anthropic, ollama, custom
+# Database
+DATABASE_URL=sqlite+aiosqlite:///./data/database.db
 
-# Add your API key
-OPENAI_API_KEY="your-api-key-here"
-GOOGLE_API_KEY="your-api-key-here"
-ANTHROPIC_API_KEY="your-api-key-here"
+# Directories
+APP_DATA_DIRECTORY=./data
+TEMP_DIRECTORY=./temp
 
-# Configure image generation
-IMAGE_PROVIDER="dall-e-3"  # Options: dall-e-3, gemini_flash, pexels, pixabay
+# LLM Configuration (Choose one)
+LLM=openai
+OPENAI_API_KEY=your_openai_api_key
+OPENAI_MODEL=gpt-4o
+
+# Image Provider (Optional)
+IMAGE_PROVIDER=pexels
+PEXELS_API_KEY=your_pexels_api_key
 ```
 
-## 📚 API Routes
+### 6. Run the Server
+
+```bash
+python server.py --port 8000 --reload true
+```
+
+The API will be available at: `http://127.0.0.1:8000`
+
+## API Documentation
+
+Once the server is running, visit:
+- **Swagger UI**: http://127.0.0.1:8000/docs
+- **ReDoc**: http://127.0.0.1:8000/redoc
+
+## Configuration Options
 
 ### LLM Providers
-- `POST /api/v1/ppt/openai/models/available` - List OpenAI models
-- `POST /api/v1/ppt/google/models/available` - List Google models
-- `POST /api/v1/ppt/anthropic/models/available` - List Anthropic models
-- `GET /api/v1/ppt/ollama/models/available` - List Ollama models
 
-### Presentations
-- `GET /api/v1/ppt/presentation/all` - List all presentations
-- `GET /api/v1/ppt/presentation/[id]` - Get presentation by ID
-- `DELETE /api/v1/ppt/presentation/[id]` - Delete presentation
-- `POST /api/v1/ppt/presentation/generate` - Generate presentation (WIP)
-
-## 🛠️ Development
-
-```bash
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Start production server
-npm start
-
-# View database
-npx prisma studio
-
-# Run linting
-npm run lint
+#### OpenAI
+```env
+LLM=openai
+OPENAI_API_KEY=sk-...
+OPENAI_MODEL=gpt-4o
 ```
 
-## 📦 Database
-
-Using Prisma ORM with SQLite (can be changed to PostgreSQL in production).
-
-### Models
-- `Presentation` - Main presentation data
-- `Slide` - Individual slides
-- `Template` - Custom templates
-- `ImageAsset` - Generated images
-- `KeyValue` - Configuration storage
-
-## 🚢 Deployment
-
-### Production Build
-
-```bash
-npm run build
-npm start
+#### Anthropic Claude
+```env
+LLM=anthropic
+ANTHROPIC_API_KEY=sk-ant-...
+ANTHROPIC_MODEL=claude-3-5-sonnet-20240620
 ```
 
-### Environment Variables
+#### Google Gemini
+```env
+LLM=google
+GOOGLE_API_KEY=...
+GOOGLE_MODEL=gemini-2.0-flash-exp
+```
 
-Make sure to set all required environment variables in your production environment.
+#### Ollama (Local)
+```env
+LLM=ollama
+OLLAMA_URL=http://localhost:11434
+OLLAMA_MODEL=llama2
+```
 
-## 📖 Documentation
+#### Custom LLM
+```env
+LLM=custom
+CUSTOM_LLM_URL=https://your-api-endpoint.com
+CUSTOM_LLM_API_KEY=...
+CUSTOM_MODEL=your-model-name
+```
 
-- [QUICKSTART.md](./QUICKSTART.md) - Quick setup guide
-- [MIGRATION_GUIDE.md](./MIGRATION_GUIDE.md) - Migration from FastAPI
-- [MIGRATION_STATUS.md](./MIGRATION_STATUS.md) - Current migration status
+### Image Providers
 
-## 🤝 Contributing
+#### Pexels
+```env
+IMAGE_PROVIDER=pexels
+PEXELS_API_KEY=...
+```
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+#### Pixabay
+```env
+IMAGE_PROVIDER=pixabay
+PIXABAY_API_KEY=...
+```
 
-## 📄 License
+#### Disable Image Generation
+```env
+DISABLE_IMAGE_GENERATION=true
+```
 
-Apache 2.0
+### Database Options
 
-## 🔗 Links
+#### SQLite (Default)
+```env
+DATABASE_URL=sqlite+aiosqlite:///./data/database.db
+```
 
-- [Documentation](https://docs.presenton.ai)
-- [Discord Community](https://discord.gg/9ZsKKxudNE)
-- [Twitter/X](https://x.com/presentonai)
+#### PostgreSQL
+```env
+DATABASE_URL=postgresql+asyncpg://user:password@localhost/dbname
+```
 
----
+#### MySQL
+```env
+DATABASE_URL=mysql+aiomysql://user:password@localhost/dbname
+```
 
-**Note**: This is a Next.js-only version. The Python FastAPI backend has been removed and all functionality is now handled by Next.js API routes.
+## Project Structure
+
+```
+presentation-1/
+├── api/                    # API routes and endpoints
+│   ├── v1/
+│   │   ├── ppt/           # Presentation endpoints
+│   │   ├── webhook/       # Webhook endpoints
+│   │   └── mock/          # Mock endpoints
+│   ├── main.py            # FastAPI application
+│   ├── lifespan.py        # App lifecycle management
+│   └── middlewares.py     # Custom middlewares
+├── services/              # Business logic services
+├── models/                # Database models
+├── utils/                 # Utility functions
+├── constants/             # Constants and configurations
+├── enums/                 # Enumerations
+├── static/                # Static files
+├── tests/                 # Test files
+├── data/                  # Application data (created on first run)
+├── temp/                  # Temporary files (created on first run)
+├── server.py              # Server entry point
+├── requirements.txt       # Python dependencies
+├── pyproject.toml         # Project configuration
+└── .env                   # Environment variables (create from .env.example)
+```
+
+## API Endpoints
+
+### Presentation Endpoints (`/api/v1/ppt`)
+- Create presentations
+- Generate slides
+- Manage templates
+- Upload/manage images
+- Search icons
+
+### Webhook Endpoints (`/api/v1/webhook`)
+- Webhook integrations
+- Event handling
+
+### Mock Endpoints (`/api/v1/mock`)
+- Testing and development
+
+## Development
+
+### Running in Development Mode
+
+```bash
+python server.py --port 8000 --reload true
+```
+
+The `--reload true` flag enables auto-reload on code changes.
+
+### Running Tests
+
+```bash
+pytest
+```
+
+### Running on Different Port
+
+```bash
+python server.py --port 3000 --reload true
+```
+
+## Troubleshooting
+
+### Python Version Issues
+Ensure you're using Python 3.11:
+```bash
+python --version
+```
+
+### Missing Dependencies
+Reinstall dependencies:
+```bash
+pip install -r requirements.txt --force-reinstall
+```
+
+### Database Issues
+Delete the database and restart:
+```bash
+rm -rf data/
+python server.py --port 8000 --reload true
+```
+
+### Port Already in Use
+Change the port number:
+```bash
+python server.py --port 8001 --reload true
+```
+
+## Environment Variables Reference
+
+| Variable | Description | Default | Required |
+|----------|-------------|---------|----------|
+| `DATABASE_URL` | Database connection string | `sqlite+aiosqlite:///./data/database.db` | No |
+| `APP_DATA_DIRECTORY` | Application data directory | `./data` | No |
+| `TEMP_DIRECTORY` | Temporary files directory | `./temp` | No |
+| `LLM` | LLM provider (openai/anthropic/google/ollama/custom) | - | Yes |
+| `OPENAI_API_KEY` | OpenAI API key | - | If using OpenAI |
+| `OPENAI_MODEL` | OpenAI model name | `gpt-4o` | If using OpenAI |
+| `ANTHROPIC_API_KEY` | Anthropic API key | - | If using Anthropic |
+| `ANTHROPIC_MODEL` | Anthropic model name | `claude-3-5-sonnet-20240620` | If using Anthropic |
+| `GOOGLE_API_KEY` | Google API key | - | If using Google |
+| `GOOGLE_MODEL` | Google model name | `gemini-2.0-flash-exp` | If using Google |
+| `OLLAMA_URL` | Ollama server URL | `http://localhost:11434` | If using Ollama |
+| `OLLAMA_MODEL` | Ollama model name | - | If using Ollama |
+| `CUSTOM_LLM_URL` | Custom LLM endpoint URL | - | If using custom |
+| `CUSTOM_LLM_API_KEY` | Custom LLM API key | - | If using custom |
+| `CUSTOM_MODEL` | Custom model name | - | If using custom |
+| `IMAGE_PROVIDER` | Image provider (pexels/pixabay) | - | No |
+| `PEXELS_API_KEY` | Pexels API key | - | If using Pexels |
+| `PIXABAY_API_KEY` | Pixabay API key | - | If using Pixabay |
+| `DISABLE_IMAGE_GENERATION` | Disable image generation | `false` | No |
+| `CAN_CHANGE_KEYS` | Allow runtime key changes | `false` | No |
+| `TOOL_CALLS` | Enable tool calls | `true` | No |
+| `DISABLE_THINKING` | Disable thinking mode | `false` | No |
+| `EXTENDED_REASONING` | Enable extended reasoning | `false` | No |
+| `WEB_GROUNDING` | Enable web grounding | `false` | No |
+
+## License
+
+See LICENSE file for details.
+
+## Support
+
+For issues and questions, please create an issue in the repository.
