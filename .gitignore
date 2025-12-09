@@ -61,3 +61,10 @@ uv.lock
 # OS files
 .DS_Store
 Thumbs.db
+
+# Large files
+*.zip
+*.tar.gz
+*.onnx
+presentation.zip
+chroma/models/
