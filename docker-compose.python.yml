@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # FastAPI Python Backend
+  fastapi:
+    build:
+      context: .
+      dockerfile: Dockerfile.python
+    container_name: presenton-fastapi
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount app_data directory for persistent storage
+      - ./app_data:/app_data
+      # Mount temp directory
+      - ./app_data/temp:/tmp/presenton
+    environment:
+      # Application directories
+      - APP_DATA_DIRECTORY=/app_data
+      - TEMP_DIRECTORY=/tmp/presenton
+      
+      # LLM Configuration (uncomment and configure as needed)
+      # - LLM=openai
+      # - OPENAI_API_KEY=${OPENAI_API_KEY}
+      # - OPENAI_MODEL=gpt-4o
+      
+      # - LLM=google
+      # - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      # - GOOGLE_MODEL=models/gemini-2.0-flash
+      
+      # - LLM=anthropic
+      # - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      # - ANTHROPIC_MODEL=claude-3-5-sonnet-20241022
+      
+      # - LLM=ollama
+      # - OLLAMA_URL=http://host.docker.internal:11434
+      # - OLLAMA_MODEL=llama3.2:3b
+      
+      # Image Generation Configuration
+      # - IMAGE_PROVIDER=dall-e-3
+      # - PEXELS_API_KEY=${PEXELS_API_KEY}
+      # - PIXABAY_API_KEY=${PIXABAY_API_KEY}
+      
+      # Application Settings
+      - CAN_CHANGE_KEYS=true
+      - DISABLE_IMAGE_GENERATION=false
+      - DISABLE_ANONYMOUS_TELEMETRY=true
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - presenton-network
+
+networks:
+  presenton-network:
+    driver: bridge
+
+volumes:
+  app_data:
+    driver: local
