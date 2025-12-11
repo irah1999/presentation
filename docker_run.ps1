@@ -10,21 +10,42 @@ Write-Host ""
 # Check if Docker is installed and running
 Write-Host "Checking Docker installation..." -ForegroundColor Yellow
 try {
-    $dockerVersion = docker --version
+    $dockerVersion = docker --version 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        throw "Docker not found"
+    }
     Write-Host "✓ Docker found: $dockerVersion" -ForegroundColor Green
 } catch {
-    Write-Host "❌ Docker is not installed or not running!" -ForegroundColor Red
-    Write-Host "Please install Docker Desktop from: https://www.docker.com/products/docker-desktop/" -ForegroundColor Yellow
+    Write-Host "❌ Docker is not installed!" -ForegroundColor Red
+    Write-Host ""
+    Write-Host "Please install Docker Desktop:" -ForegroundColor Yellow
+    Write-Host "  1. Download from: https://www.docker.com/products/docker-desktop/" -ForegroundColor White
+    Write-Host "  2. Install and restart your computer" -ForegroundColor White
+    Write-Host "  3. Run this script again" -ForegroundColor White
+    Write-Host ""
+    Read-Host "Press Enter to exit"
     exit 1
 }
 
-# Check if Docker is running
+# Check if Docker Desktop is running
+Write-Host "Checking if Docker Desktop is running..." -ForegroundColor Yellow
 try {
-    docker ps | Out-Null
-    Write-Host "✓ Docker is running" -ForegroundColor Green
+    $null = docker ps 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        throw "Docker not running"
+    }
+    Write-Host "✓ Docker Desktop is running" -ForegroundColor Green
 } catch {
-    Write-Host "❌ Docker is not running!" -ForegroundColor Red
-    Write-Host "Please start Docker Desktop and try again." -ForegroundColor Yellow
+    Write-Host "❌ Docker Desktop is not running!" -ForegroundColor Red
+    Write-Host ""
+    Write-Host "Please start Docker Desktop:" -ForegroundColor Yellow
+    Write-Host "  1. Open Docker Desktop from Start Menu" -ForegroundColor White
+    Write-Host "  2. Wait for the whale icon in system tray to be steady" -ForegroundColor White
+    Write-Host "  3. Run this script again" -ForegroundColor White
+    Write-Host ""
+    Write-Host "Tip: You can verify Docker is running with: docker ps" -ForegroundColor Gray
+    Write-Host ""
+    Read-Host "Press Enter to exit"
     exit 1
 }
 
