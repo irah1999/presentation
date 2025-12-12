@@ -7,6 +7,11 @@ from services.icon_finder_service import ICON_FINDER_SERVICE
 from services.image_generation_service import ImageGenerationService
 from utils.asset_directory_utils import get_images_directory
 from utils.dict_utils import get_dict_at_path, get_dict_paths_with_key, set_dict_at_path
+from pathlib import Path
+
+
+path_object = Path('server.py')
+projectRootPath = path_object.resolve().parent
 
 
 async def process_slide_and_fetch_assets(
@@ -43,8 +48,11 @@ async def process_slide_and_fetch_assets(
         image_dict = get_dict_at_path(slide.content, image_path)
         result = results.pop()
         if isinstance(result, ImageAsset):
+            absolute_image_path = Path(result.path)
+            relative_image_path = absolute_image_path.relative_to(projectRootPath)
+            imagePath = "/"+str(relative_image_path)
             return_assets.append(result)
-            image_dict["__image_url__"] = result.path
+            image_dict["__image_url__"] = imagePath
         else:
             image_dict["__image_url__"] = result
         set_dict_at_path(slide.content, image_path, image_dict)
@@ -107,6 +115,7 @@ async def process_old_and_new_slides_and_fetch_assets(
     # Creates async tasks for fetching new images
     # Use old image url if prompt is same
     for new_image in new_image_dicts:
+        print("Generated image resultnew_image:new_image:", new_image)
         if new_image["__image_prompt__"] in old_image_prompts:
             old_image_url = old_image_dicts[
                 old_image_prompts.index(new_image["__image_prompt__"])
@@ -148,6 +157,7 @@ async def process_old_and_new_slides_and_fetch_assets(
 
     # Sets new image and icon urls for assets that were fetched
     for i, new_image in enumerate(new_images):
+        print("Generated image resultnew_image:new_image.153line.no:", new_image)
         if new_images_fetch_status[i]:
             fetched_image = new_images[i]
             if isinstance(fetched_image, ImageAsset):

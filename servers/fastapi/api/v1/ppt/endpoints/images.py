@@ -11,8 +11,13 @@ from utils.asset_directory_utils import get_images_directory
 import os
 import uuid
 from utils.file_utils import get_file_name_with_random_uuid
+from pathlib import Path
+import copy
 
 IMAGES_ROUTER = APIRouter(prefix="/images", tags=["Images"])
+
+path_object = Path('server.py')
+projectRootPath = path_object.resolve().parent
 
 
 @IMAGES_ROUTER.get("/generate")
@@ -30,7 +35,21 @@ async def generate_image(
     sql_session.add(image)
     await sql_session.commit()
 
-    return image.path
+    absolute_path_obj   = Path(image.path)
+    imagePath           = absolute_path_obj.relative_to(projectRootPath)
+    return imagePath
+
+def update_image_paths(assets: list[ImageAsset], root: Path):
+    for asset in assets:
+        absolute_path = Path(asset.path)
+        try:
+            relative_path_object = absolute_path.relative_to(root)
+            asset.path = "/" + str(relative_path_object)
+        except ValueError as e:
+            print(f"Path error for {asset.path}: {e}")
+            pass # You might choose to skip or log this asset
+    return assets
+
 
 
 @IMAGES_ROUTER.get("/generated", response_model=List[ImageAsset])
@@ -41,7 +60,7 @@ async def get_generated_images(sql_session: AsyncSession = Depends(get_async_ses
             .where(ImageAsset.is_uploaded == False)
             .order_by(ImageAsset.created_at.desc())
         )
-        return images
+        return update_image_paths(images.all(), projectRootPath)
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Failed to retrieve generated images: {str(e)}"
@@ -65,6 +84,10 @@ async def upload_image(
 
         sql_session.add(image_asset)
         await sql_session.commit()
+
+        absolute_path_obj = Path(image_asset.path)
+        relative_path_obj = absolute_path_obj.relative_to(projectRootPath)
+        image_asset.path = "/" + str(relative_path_obj)
 
         return image_asset
     except Exception as e:
