@@ -5,10 +5,10 @@ import ssl
 
 
 def get_database_url_and_connect_args() -> tuple[str, dict]:
-    database_url = get_database_url_env() or "sqlite:///" + os.path.join(
-        get_app_data_directory_env() or "/tmp/presenton", "fastapi.db"
-    )
+    # Default to MySQL instead of SQLite
+    database_url = get_database_url_env() or "mysql://root:root@localhost:3306/presenton_db"
 
+    # Convert database URLs to async drivers
     if database_url.startswith("sqlite://"):
         database_url = database_url.replace("sqlite://", "sqlite+aiosqlite://", 1)
     elif database_url.startswith("postgresql://"):
@@ -18,9 +18,18 @@ def get_database_url_and_connect_args() -> tuple[str, dict]:
     else:
         database_url = database_url
 
+    # Connection arguments based on database type
     connect_args = {}
+    
+    # SQLite specific settings
     if "sqlite" in database_url:
         connect_args["check_same_thread"] = False
+    
+    # MySQL specific settings for better performance
+    elif "mysql" in database_url:
+        connect_args["charset"] = "utf8mb4"
+        connect_args["pool_recycle"] = 3600  # Recycle connections after 1 hour
+        connect_args["pool_pre_ping"] = True  # Verify connections before using
 
     try:
         split_result = urlsplit(database_url)

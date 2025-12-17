@@ -24,7 +24,23 @@ from utils.db_utils import get_database_url_and_connect_args
 
 database_url, connect_args = get_database_url_and_connect_args()
 
-sql_engine: AsyncEngine = create_async_engine(database_url, connect_args=connect_args)
+# Create async engine with MySQL-optimized settings
+engine_kwargs = {
+    "connect_args": connect_args,
+    "echo": False,  # Set to True for SQL query logging during development
+}
+
+# Add MySQL-specific pool settings for production
+if "mysql" in database_url:
+    engine_kwargs.update({
+        "pool_size": 20,  # Number of connections to maintain
+        "max_overflow": 10,  # Additional connections when pool is full
+        "pool_timeout": 30,  # Seconds to wait for connection from pool
+        "pool_recycle": 3600,  # Recycle connections after 1 hour
+        "pool_pre_ping": True,  # Verify connection health before using
+    })
+
+sql_engine: AsyncEngine = create_async_engine(database_url, **engine_kwargs)
 async_session_maker = async_sessionmaker(sql_engine, expire_on_commit=False)
 
 
