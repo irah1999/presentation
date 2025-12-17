@@ -1,6 +1,9 @@
 import uvicorn
 import argparse
 
+def read_root():
+    return {"message": "FastAPI Server is running and static files are mounted."}
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run the FastAPI server")
     parser.add_argument(

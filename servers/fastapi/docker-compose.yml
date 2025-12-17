@@ -1,0 +1,59 @@
+services:
+  fastapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fastapi-presenton
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount the entire app for hot-reload during development
+      - ./api:/app/api
+      - ./services:/app/services
+      - ./models:/app/models
+      - ./utils:/app/utils
+      - ./constants:/app/constants
+      - ./enums:/app/enums
+      # Persist data directories
+      - ./chroma:/app/chroma
+      - ./app_data:/app/app_data
+      - ./static:/app/static
+    environment:
+      # Database
+      - DATABASE_URL=${DATABASE_URL:-sqlite:///./app_data/presenton.db}
+      
+      # LLM Providers (Optional - set in .env file)
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
+      - GROQ_API_KEY=${GROQ_API_KEY:-}
+      
+      # Ollama
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      
+      # Image Generation
+      - IMAGE_PROVIDER=${IMAGE_PROVIDER:-stability}
+      - STABILITY_API_KEY=${STABILITY_API_KEY:-}
+      
+      # App Settings
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - CORS_ORIGINS=${CORS_ORIGINS:-*}
+      
+    restart: unless-stopped
+    networks:
+      - fastapi-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  fastapi-network:
+    driver: bridge
+
+volumes:
+  chroma-data:
+  app-data:
+  static-data:
